@@ -2,6 +2,7 @@
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
+  :heroku {:app-name "todoaday"}
 
   :dependencies [[ch.qos.logback/logback-classic "1.2.3"]
                  [cheshire "5.8.1"]
