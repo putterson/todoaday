@@ -15,7 +15,9 @@
 (defn home-routes []
   [""
    {:middleware [middleware/wrap-csrf
-                 middleware/wrap-formats]}
+                 middleware/wrap-formats
+                 middleware/wrap-restricted
+                 ]}
    ["/" {:get home-page}]
    ["/about" {:get about-page}]])
 

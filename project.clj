@@ -4,7 +4,8 @@
   :url "http://example.com/FIXME"
   :heroku {:app-name "todoaday"}
 
-  :dependencies [[ch.qos.logback/logback-classic "1.2.3"]
+  :dependencies [[buddy "2.0.0"]
+                 [ch.qos.logback/logback-classic "1.2.3"]
                  [cheshire "5.8.1"]
                  [clojure.java-time "0.3.2"]
                  [conman "0.8.3"]

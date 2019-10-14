@@ -2,6 +2,7 @@
   (:require
     [selmer.parser :as parser]
     [selmer.filters :as filters]
+    [hiccup.core :refer [html h]]
     [markdown.core :refer [md-to-html-string]]
     [ring.util.http-response :refer [content-type ok]]
     [ring.util.anti-forgery :refer [anti-forgery-field]]
@@ -22,6 +23,21 @@
           :page template
           :csrf-token *anti-forgery-token*)))
     "text/html; charset=utf-8"))
+
+; (defn render-base
+;   [title body]
+;   (html [:html
+;           [:head
+;           [:title title]]
+;           [:body body]]))
+
+; (defn render-login [context]
+;   (render-base "Login"
+;                 [:div [:h3.text-center
+;                       "You're not authenticated"]
+;                 [:p.text-center
+;                   [:a.btn.btn-primary {:href (:google-uri context)}
+;                   "Log in with Google"]]]))
 
 (defn error-page
   "error-details should be a map containing the following keys:
