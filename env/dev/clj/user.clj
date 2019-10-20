@@ -8,7 +8,8 @@
     [todoaday.core :refer [start-app]]
     [todoaday.db.core]
     [conman.core :as conman]
-    [luminus-migrations.core :as migrations]))
+    [luminus-migrations.core :as migrations]
+    [clojure.tools.namespace.repl :as repl]))
 
 (alter-var-root #'s/*explain-out* (constantly expound/printer))
 
@@ -30,6 +31,10 @@
   []
   (stop)
   (start))
+
+(defn refresh
+  []
+  (repl/refresh))
 
 (defn restart-db 
   "Restarts database."

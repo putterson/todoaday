@@ -4,7 +4,8 @@
     [todoaday.db.core :as db]
     [clojure.java.io :as io]
     [todoaday.middleware :as middleware]
-    [ring.util.http-response :as response]))
+    ; [ring.util.http-response :as response]
+    ))
 
 (defn home-page [request]
   (layout/render request "home.html" {:docs (-> "docs/docs.md" io/resource slurp)}))

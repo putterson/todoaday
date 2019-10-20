@@ -11,6 +11,10 @@
    [todoaday.config :refer [env]]
    [ring-ttl-session.core :refer [ttl-memory-store]]
    [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
+   [ring.middleware.cookies :refer [wrap-cookies]]
+  ;  [ring.middleware.params :refer [wrap-params]]
+   [ring.util.http-response :as response]
+   [ring.util.response :refer [redirect]]
    [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
    [buddy.auth.accessrules :refer [restrict]]
    [buddy.auth :refer [authenticated?]]
@@ -48,9 +52,15 @@
    :headers {"Content-Type" "text/plain"}
    :body    (str "Access to " (:uri request) " is not authorized")})
 
+(defn on-restricted [request _]
+  (let [current-url (:uri request)
+        redirect-uri (str "/login?next=" current-url)]
+    (log/info "Not authenticated. Redirecting to" redirect-uri)
+    (redirect redirect-uri)))
+
 (defn wrap-restricted [handler]
   (restrict handler {:handler authenticated?
-                     :on-error on-error}))
+                     :on-error on-restricted}))
 
 ; (defn on-error [request response]
 ;   (error-page
@@ -80,4 +90,6 @@
            (assoc-in [:security :anti-forgery] false)
            (assoc-in  [:session :store] (ttl-memory-store (* 60 30)))))
       (wrap-authentication (session-backend))
+      wrap-cookies
+      wrap-params
       wrap-internal-error))
