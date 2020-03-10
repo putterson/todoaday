@@ -9,7 +9,7 @@ test-config.edn
 *.class
 /.lein-*
 profiles.clj
-/.env
+/.env.edn
 .nrepl-port
 
 /node_modules
