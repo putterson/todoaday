@@ -7,7 +7,8 @@
   ;  [ring.util.http-response :as response]
    [auth0-ring.handlers :as auth0-handlers]
    [ring.util.response :refer [redirect]]
-   [todoaday.config :refer [env]])
+   [todoaday.config :refer [env]]
+   [mount.core :refer [defstate]])
   (:import (java.net URLEncoder)))
 
 ; (defroutes login-routes
@@ -35,18 +36,16 @@
 ;   ; (layout/render request "about.html"))
 ;   (show-login-page next))
 
+(defstate config :start {:port (env :port)
+                        :domain (env :auth0-domain)
+                        :client-id (env :auth0-client-id)
+                        :client-secret (env :auth0-client-secret)
+                        :callback-uri (env :auth0-callback-url (format "http://localhost:%d/callback" (env :port)))
+                        :callback-path "/callback"
+                        :scope "dunno"})
 
 
   (def login
-    (let [config '{
-      :port (env :port)
-      :domain (env :auth0-domain)
-      :client-id (env :auth0-client-id)
-      :client-secret (env :auth0-client-secret)
-      :callback-uri (env :auth0-callback-url (format "http://localhost:%d/callback" (env :port)))
-      :callback-path "/"
-      :scope "dunno"
-      }]
 
     (auth0-handlers/wrap-login-handler
      (fn [req]
@@ -74,7 +73,7 @@
                     
                     lock.show();</script>
                       </body>
-                    </html>")}))))
+                    </html>")})))
 
 (defn auth-routes []
   [""

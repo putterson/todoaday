@@ -10,4 +10,5 @@
     :merge
     [(args)
      (source/from-system-props)
+     (source/from-file ".env.edn")
      (source/from-env)]))
