@@ -54,7 +54,7 @@
 
 (defn on-restricted [request _]
   (let [current-url (:uri request)
-        redirect-uri (str "/login?next=" current-url)]
+        redirect-uri (str "/login?returnUrl=" current-url)]
     (log/info "Not authenticated. Redirecting to" redirect-uri)
     (redirect redirect-uri)))
 
@@ -62,26 +62,11 @@
   (restrict handler {:handler authenticated?
                      :on-error on-restricted}))
 
-; (defn on-error [request response]
-;   (error-page
-;    {:status 403
-;     :title (str "Access to " (:uri request) " is not authorized")}))
-
-; (defn on-restricted [request _]
-; (let [current-url (:uri request)
-;       redirect-uri (str "/login?next=" current-url)]
-;   (log/info "Not authenticated. Redirecting to" redirect-uri)
-;   (response/redirect redirect-uri)))
-
-; (defn wrap-restricted [handler]
-;   (restrict handler {:handler authenticated?
-;                      :on-error on-error}))
-
-; (defn wrap-auth [handler]
-;   (let [backend (session-backend)]
-;     (-> handler
-;         (wrap-authentication backend)
-;         (wrap-authorization backend))))
+ (defn wrap-auth [handler]
+   (let [backend (session-backend)]
+     (-> handler
+         (wrap-authentication backend)
+         (wrap-authorization backend))))
 
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)
@@ -89,7 +74,7 @@
        (-> site-defaults
            (assoc-in [:security :anti-forgery] false)
            (assoc-in  [:session :store] (ttl-memory-store (* 60 30)))))
-      (wrap-authentication (session-backend))
+      wrap-auth
       wrap-cookies
       wrap-params
       wrap-internal-error))

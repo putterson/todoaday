@@ -6,7 +6,8 @@
     [markdown.core :refer [md-to-html-string]]
     [ring.util.http-response :refer [content-type ok]]
     [ring.util.anti-forgery :refer [anti-forgery-field]]
-    [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]))
+    [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
+    [clojure.tools.logging :as log]))
 
 (parser/set-resource-path!  (clojure.java.io/resource "html"))
 (parser/add-tag! :csrf-field (fn [_ _] (anti-forgery-field)))
@@ -24,20 +25,31 @@
           :csrf-token *anti-forgery-token*)))
     "text/html; charset=utf-8"))
 
-; (defn render-base
-;   [title body]
-;   (html [:html
-;           [:head
-;           [:title title]]
-;           [:body body]]))
+ (defn render-base
+   [title body]
+   (html [:html
+           [:head
+           [:title title]]
+           [:body body]]))
 
-; (defn render-login [context]
-;   (render-base "Login"
-;                 [:div [:h3.text-center
-;                       "You're not authenticated"]
-;                 [:p.text-center
-;                   [:a.btn.btn-primary {:href (:google-uri context)}
-;                   "Log in with Google"]]]))
+ (defn render-login [context]
+   (render-base "Login"
+                 [:div [:h3.text-center
+                       "You're not authenticated"]
+                 [:p.text-center
+                   [:a.btn.btn-primary {:href (:google-uri context)}
+                   "Log in with Google"]]]))
+
+(defn render-home [context]
+  (log/debug "Rendering home with" context)
+  (render-base "Home"
+               [:div [:h3.text-center
+                      (h (format "You're authenticated as %s <%s>"
+                                 (get-in context [:profile :name])
+                                 (get-in context [:profile :email])))]
+                [:p.text-center
+                 [:a.btn.btn-primary {:href "/logout"}
+                  "Log out"]]]))
 
 (defn error-page
   "error-details should be a map containing the following keys:

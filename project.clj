@@ -33,7 +33,11 @@
                  [ring-webjars "0.2.0"]
                  [ring/ring-core "1.7.1"]
                  [ring/ring-defaults "0.3.2"]
-                 [auth0-ring "0.4.4"]
+                 [buddy/buddy-auth "2.2.0"]
+                 ;[com.auth0/mvc-auth-commons  "1.2.0"]
+                 ;[auth0-ring "0.4.4"]
+                 [clj-http "3.3.0"]
+                 [compojure "1.5.1"]
                  [selmer "1.12.14"]]
 
   :min-lein-version "2.0.0"
