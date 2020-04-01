@@ -9,7 +9,8 @@
     [ring.middleware.webjars :refer [wrap-webjars]]
     [todoaday.env :refer [defaults]]
     [compojure.core :refer [defroutes routes wrap-routes GET]]
-    [mount.core :as mount]))
+    [mount.core :as mount]
+    [ring.middleware.reload :refer [wrap-reload]]))
 
 (mount/defstate init-app
   :start ((or (:init defaults) (fn [])))
@@ -18,7 +19,7 @@
 (mount/defstate app-routes
   :start
   (routes
-
+    auth-routes
     (ring/ring-handler
       (ring/router
         [(home-routes)])
@@ -27,7 +28,7 @@
           {:path "/"})
         (wrap-content-type
           (wrap-webjars (constantly nil)))))
-    auth-routes))
+    ))
 
 ;(ring/create-default-handler
 ;  {:not-found
@@ -40,6 +41,9 @@
 ;(mount/defstate auth-only-routes
 ;  :start
 ;  auth-routes)
-
 (defn app []
   (middleware/wrap-base #'app-routes))
+
+(def reloadable-app
+  (wrap-reload #'app))
+

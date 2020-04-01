@@ -19,11 +19,7 @@
     [buddy.auth :as auth]
     [compojure.core :refer [defroutes routes wrap-routes GET]]
     [compojure.route :as route])
-  (:import
-    [java.security Signature]
-    [java.security.cert Certificate CertificateFactory]
-    [java.net URLEncoder]
-    (java.nio.charset Charset StandardCharsets)))
+  (:import [java.net URLEncoder]))
 
 ; (defroutes login-routes
 ;     ; (GET "/login" [next] (show-login-page next))
@@ -59,25 +55,6 @@
                          :success-redirect "/"
                          :error-redirect "/login"
                          :scope "openid user_id name nickname email email_verified picture"})
-
-(def ^Charset UTF8 StandardCharsets/UTF_8)
-
-(defn to-bytes
-  (^bytes [value] (to-bytes value UTF8))
-  (^bytes [value ^Charset coding]
-   (cond (bytes? value) value
-         (string? value) (.getBytes ^String value coding)
-         :else nil)))
-
-(def ^:private ^Signature sign (Signature/getInstance "SHA256withRSA"))
-(def ^:private ^CertificateFactory cf (CertificateFactory/getInstance "X.509"))
-
-(defn to-cert ^Certificate [secret]
-  (if (instance? Certificate secret)
-    secret
-    (.generateCertificate cf (clojure.java.io/input-stream (to-bytes secret)))))
-
-(def ^:private ^Certificate cert (to-cert (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem")))
 
 (defn user-authenticated [email auth0-user-id]
   (log/info "User" email "with id" auth0-user-id "authenticated")
@@ -123,8 +100,8 @@
                         (jws/unsign (buddy-keys/str->public-key (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem"))  {:alg :rs256})
                         String.
                         (json/parse-string true))
-        profile (select-keys payload [:user_id :email :email_verified :name])
-        {:keys [email auth0-user-id] :as profile} (clojure.set/rename-keys profile {:user_id        :auth0-user-id
+        profile (select-keys payload [:sub :email :email_verified :name])
+        {:keys [email auth0-user-id] :as profile} (clojure.set/rename-keys profile {:sub        :auth0-user-id
                                                                                     :email_verified :email-verified})
         next-uri (or next "/")]
     (if payload
@@ -134,7 +111,7 @@
           (if-let [internal-user-id (user-authenticated email auth0-user-id)]
             (do
               (log/infof "User %s with email %s is authenticated as %s, redirecting to %s" auth0-user-id email internal-user-id next-uri)
-              (-> (response/redirect next-uri)
+              (-> (response/set-cookie (response/redirect next-uri) "jwt" id-token)
                   (assoc :session (assoc session :identity (assoc profile :user-id internal-user-id)))))
             (auth/throw-unauthorized {:message (str "Failed to authenticate user " auth0-user-id " with email " email)
                                       :profile profile}))
@@ -157,7 +134,6 @@
   (layout/render-home {:profile (:identity session)}))
 
 (defroutes login-routes
-           (GET "/" [:as req] (show-home-page (session)))
            (GET "/login" [next] (show-login-page next))
            (GET "/logout" [:as req] (handle-logout req))
            (GET "/callback" [code state next :as req] (handle-login code state next req)))
