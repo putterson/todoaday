@@ -33,6 +33,7 @@
                  [ring-webjars "0.2.0"]
                  [ring/ring-core "1.7.1"]
                  [ring/ring-defaults "0.3.2"]
+                 [ring-cors "0.1.13"]
                  [buddy/buddy-auth "2.2.0"]
                  ;[com.auth0/mvc-auth-commons  "1.2.0"]
                  ;[auth0-ring "0.4.4"]

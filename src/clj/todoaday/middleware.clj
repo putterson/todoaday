@@ -23,8 +23,12 @@
     [buddy.core.keys :as buddy-keys]
     [buddy.auth.http :as http]
     [buddy.auth.protocols :as proto]
-    [buddy.sign.jws :as jws])
+    [buddy.sign.jws :as jws]
+    [ring.middleware.cors :as cors]
+    [mount.core :refer [defstate]])
   (:import))
+
+(defstate config :start {:domain (env :auth0-domain)})
 
 (defn wrap-internal-error [handler]
   (fn [req]
@@ -44,6 +48,9 @@
      {:status 403
       :title "Invalid anti-forgery token"})}))
 
+(defn wrap-cors [handler]
+  (cors/wrap-cors handler :access-control-allow-origin [(str "http://" (:domain config) "/")]
+                          :access-control-allow-methods [:get :put :post :delete]))
 
 (defn wrap-formats [handler]
   (let [wrapped (-> handler wrap-params (wrap-format formats/instance))]
@@ -117,6 +124,7 @@
            (assoc-in [:security :anti-forgery] false)
            (assoc-in  [:session :store] (ttl-memory-store (* 60 30)))))
       wrap-auth
+      wrap-cors
       wrap-cookies
       wrap-params
       wrap-internal-error))

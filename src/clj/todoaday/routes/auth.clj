@@ -52,7 +52,7 @@
                          :client-secret (env :auth0-client-secret)
                          :callback-uri (env :auth0-callback-url (format "http://localhost:%d/callback" (env :port)))
                          :callback-path "/callback"
-                         :success-redirect "/"
+                         :success-redirect (format "http://localhost:%d/" (env :port))
                          :error-redirect "/login"
                          :scope "openid user_id name nickname email email_verified picture"})
 
@@ -62,6 +62,34 @@
   ;; do whatever is required with this authenticated user, eg store in db and return an internal id
   12345
   )
+
+(def login
+   (fn [req]
+     {:status  200
+      :headers {"Content-Type" "text/html"}
+      :body    (str "<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <script src='https://cdn.auth0.com/js/lock/11.22.5/lock.min.js'></script>
+    <script>var lock = new Auth0Lock(
+'" (:client-id config) "',
+'" (:domain config) "', {
+  auth: {
+    params: {
+      scope: '" (:scope config) "',
+      state: 'nonce=" (:nonce req) "&returnUrl=" (get-in req [:query-params "returnUrl"]) "'
+    },
+    responseType: 'code',
+    redirectUrl: window.location.origin + '" (:callback-path config) "'
+  }
+});
+
+lock.show();</script>
+  </body>
+</html>")}))
 
 (defn show-login-page [next]
   (let [redirect-uri (URLEncoder/encode (if next
@@ -93,10 +121,6 @@
 
         _ (log/debug "Authorization code" code "is good, received id_token with header" (jws/decode-header id-token))
         payload (some-> id-token
-                        ;(jws/unsign (:client-secret config))
-                        ;b64/decode
-
-                        ;(jws/unsign (.getEncoded cert))
                         (jws/unsign (buddy-keys/str->public-key (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem"))  {:alg :rs256})
                         String.
                         (json/parse-string true))
@@ -124,17 +148,19 @@
   (if-let [user (:identity session)]
     (log/info "Logging out user" user)
     (log/info "No user in session, logging out regardless"))
-  (-> (response/redirect (format "https://%s/v2/logout?returnTo=%s&client_id=%s"
-                                 (:domain config)
-                                 (URLEncoder/encode (:success-redirect config) "UTF-8")
-                                 (URLEncoder/encode (:client-id config) "UTF-8")))
+  (-> (response/set-cookie (response/redirect (format "https://%s/v2/logout?returnTo=%s&client_id=%s"
+                                             (:domain config)
+                                             (URLEncoder/encode (:success-redirect config) "UTF-8")
+                                             (URLEncoder/encode (:client-id config) "UTF-8")))
+                  "jwt"
+                  "")
       (assoc :session {})))
 
 (defn show-home-page [{:keys [session]}]
   (layout/render-home {:profile (:identity session)}))
 
 (defroutes login-routes
-           (GET "/login" [next] (show-login-page next))
+           (GET "/login" [:as req] (login req))
            (GET "/logout" [:as req] (handle-logout req))
            (GET "/callback" [code state next :as req] (handle-login code state next req)))
 
