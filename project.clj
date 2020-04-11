@@ -39,10 +39,14 @@
                  ;[auth0-ring "0.4.4"]
                  [clj-http "3.3.0"]
                  [compojure "1.5.1"]
-                 [selmer "1.12.14"]]
+                 [selmer "1.12.14"]
+                 [hiccup "1.0.5"]
+                 [juxt/crux-core "20.04-1.8.1-alpha"]
+                 [juxt/crux-jdbc "20.04-1.8.1-alpha"]
+                 ]
 
   :min-lein-version "2.0.0"
-  
+
   :source-paths ["src/clj"]
   :test-paths ["test/clj"]
   :resource-paths ["resources"]

@@ -1,4 +1,7 @@
 {
-    :database-url "jdbc:h2:./todoaday.db"
-    :port 3000
-}
+ :database-type "h2"
+ :database-dir  "./"
+ :database-name "todoaday"
+ :database-url  "jdbc:h2:./todoaday.db"
+ :port          3000
+ }
