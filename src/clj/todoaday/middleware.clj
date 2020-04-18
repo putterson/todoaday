@@ -124,7 +124,7 @@
            (assoc-in [:security :anti-forgery] false)
            (assoc-in  [:session :store] (ttl-memory-store (* 60 30)))))
       wrap-auth
-      wrap-cors
+      ;wrap-cors
       wrap-cookies
       wrap-params
       wrap-internal-error))
