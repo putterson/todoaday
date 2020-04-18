@@ -4,6 +4,7 @@
     [todoaday.layout :refer [error-page]]
     [todoaday.routes.home :refer [home-routes]]
     [todoaday.routes.auth :refer [auth-routes]]
+    [todoaday.routes.todo :refer [todo-routes]]
     [reitit.ring :as ring]
     [ring.middleware.content-type :refer [wrap-content-type]]
     [ring.middleware.webjars :refer [wrap-webjars]]
@@ -20,6 +21,7 @@
   :start
   (routes
     auth-routes
+    todo-routes
     (ring/ring-handler
       (ring/router
         [(home-routes)])

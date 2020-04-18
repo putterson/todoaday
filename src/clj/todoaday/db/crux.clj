@@ -3,7 +3,8 @@
     [todoaday.config :refer [env]]
     [mount.core :refer [defstate]]
     [crux.api :as crux]
-    [clojure.java.io :as io]))
+    [clojure.java.io :as io])
+  (:import (java.util UUID)))
 
 (defn start-jdbc-node ^crux.api.ICruxAPI [env]
   (let [{database-type :database-type
@@ -30,20 +31,18 @@
           :stop (.close *crux-conn*))
 
 
-(defn people []
-  (crux/q (crux/db *crux-conn*)
-             '{:find [e]
-               :where [[e :name "Pablo"]]}))
+(defn todos []
+  (map #(zipmap [:todos/id :todos/description] %)
+               (crux/q (crux/db *crux-conn*)
+                       '{:find  [?e desc]
+                         :where [[?e :todos/description desc]]})))
 
-(defn add-picasso []
-  (crux/submit-tx
-    *crux-conn*
-    [[:crux.tx/put
-      {:crux.db/id :dbpedia.resource/Pablo-Picasso ; id
-       :name "Pablo"
-       :last-name "Picasso"}
-      #inst "2018-05-18T09:20:27.966-00:00"]]) ; valid time
-  )
-
-(comment ; which can be used as
-  (def node (start-standalone-node "crux-store")))
+(defn add-todo [description]
+  (let [result (crux/submit-tx
+                 *crux-conn*
+                 [[:crux.tx/cas
+                   nil
+                   {:crux.db/id        (UUID/randomUUID)
+                    :todos/description description}]]
+                 )]
+    result))

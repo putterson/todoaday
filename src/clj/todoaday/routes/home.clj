@@ -15,18 +15,6 @@
 (defn about-page [request]
   (layout/render request "about.html"))
 
-(defn add-form []
-  (hiccup/html (f/form-to [:post "/add"]
-              (f/text-field {:placeholder "Description"} "description")
-              (f/submit-button "add"))))
-
-(defn add-todos []
-  (db/add-picasso)
-  (hiccup/html [:div (db/people)]))
-
-(defn add-page [request]
-  (layout/render request "add.html" {:form (add-todos)}))
-
 (defn home-routes []
   [""
    {:middleware [middleware/wrap-csrf
@@ -34,6 +22,5 @@
                  middleware/wrap-restricted
                  ]}
    ["/" {:get home-page}]
-   ["/add" {:get add-page}]
    ["/about" {:get about-page}]])
 
