@@ -31,18 +31,26 @@
           :stop (.close *crux-conn*))
 
 
-(defn todos []
-  (map #(zipmap [:todos/id :todos/description] %)
+(defn todos [user-id]
+  (crux.api/sync *crux-conn*)
+  (map #(zipmap [:crux.db/id :todos/id :todos/description] %)
                (crux/q (crux/db *crux-conn*)
-                       '{:find  [?e desc]
-                         :where [[?e :todos/description desc]]})))
+                       {:find     '[?e id desc time]
+                         :where    '[[?e :todos/description desc]
+                                    [?e :crux.db/id id]
+                                    [?e :todos/creator-user-id creator-user-id]
+                                    [?e :todos/creation-time time]]
+                         :args [{'creator-user-id user-id}]
+                         :order-by '[[time :desc]]})))
 
-(defn add-todo [description]
+(defn add-todo [{:keys [description creator-user-id]}]
   (let [result (crux/submit-tx
                  *crux-conn*
                  [[:crux.tx/cas
                    nil
                    {:crux.db/id        (UUID/randomUUID)
+                    :todos/creator-user-id creator-user-id
+                    :todos/creation-time (java.time.OffsetDateTime/now)
                     :todos/description description}]]
                  )]
     result))

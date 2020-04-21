@@ -15,6 +15,7 @@
     ;  [ring.middleware.params :refer [wrap-params]]
     [ring.util.http-response :as response]
     [ring.util.response :refer [redirect]]
+    [cheshire.core :as json]
     [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
     [buddy.auth.accessrules :refer [restrict]]
     [buddy.auth :refer [authenticated?]]
@@ -87,6 +88,17 @@
                    (get "jwt")
                    (:value))))
 
+(defn authfn [request data secret options]
+  (try
+    (-> (jws/unsign data secret options)
+        String.
+        (json/parse-string true))
+    (catch clojure.lang.ExceptionInfo e
+      (let [data (ex-data e)]
+        (when (fn? on-error)
+          (on-error request e))
+        nil))))
+
 (defn jws-cookie-backend
   [{:keys [secret authfn unauthorized-handler options token-name on-error]
     :or {authfn identity token-name "Token"}}]
@@ -97,13 +109,7 @@
       (parse-jws-cookie request token-name))
 
     (-authenticate [_ request data]
-      (try
-        (authfn (jws/unsign data secret options))
-        (catch clojure.lang.ExceptionInfo e
-          (let [data (ex-data e)]
-            (when (fn? on-error)
-              (on-error request e))
-            nil))))
+      (authfn request data secret options))
 
     proto/IAuthorization
     (-handle-unauthorized [_ request metadata]
@@ -112,7 +118,9 @@
         (handle-unauthorized-default request)))))
 
  (defn wrap-auth [handler]
-   (let [backend (jws-cookie-backend {:secret (buddy-keys/str->public-key (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem")) :options {:alg :rs256}})]
+   (let [backend (jws-cookie-backend {:secret  (buddy-keys/str->public-key (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem"))
+                                      :authfn  authfn
+                                      :options {:alg :rs256}})]
      (-> handler
          (wrap-authentication backend)
          (wrap-authorization backend))))
