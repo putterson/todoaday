@@ -120,7 +120,7 @@ lock.show();</script>
 
         _ (log/debug "Authorization code" code "is good, received id_token with header" (jws/decode-header id-token))
         payload (some-> id-token
-                        (jws/unsign (buddy-keys/str->public-key (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem"))  {:alg :rs256})
+                        (jws/unsign (buddy-keys/str->public-key (slurp (io/resource "certs/still-cherry-6903.pem")))  {:alg :rs256})
                         String.
                         (json/parse-string true))
         profile (select-keys payload [:sub :email :email_verified :name])

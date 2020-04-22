@@ -26,7 +26,8 @@
     [buddy.auth.protocols :as proto]
     [buddy.sign.jws :as jws]
     [ring.middleware.cors :as cors]
-    [mount.core :refer [defstate]])
+    [mount.core :refer [defstate]]
+    [clojure.java.io :as io])
   (:import))
 
 (defstate config :start {:domain (env :auth0-domain)})
@@ -118,7 +119,7 @@
         (handle-unauthorized-default request)))))
 
  (defn wrap-auth [handler]
-   (let [backend (jws-cookie-backend {:secret  (buddy-keys/str->public-key (slurp "/home/patcgoe/Downloads/still-cherry-6903.pem"))
+   (let [backend (jws-cookie-backend {:secret  (buddy-keys/str->public-key (slurp (io/resource "certs/still-cherry-6903.pem")))
                                       :authfn  authfn
                                       :options {:alg :rs256}})]
      (-> handler
