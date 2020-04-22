@@ -3,13 +3,20 @@
     [todoaday.config :refer [env]]
     [mount.core :refer [defstate]]
     [crux.api :as crux]
-    [clojure.java.io :as io])
+    [clojure.java.io :as io]
+    [clojure.string :as string])
   (:import (java.util UUID)))
+
+(defn make-jdbc-url
+  [maybe-connection-url] (if-some [connection-url maybe-connection-url]
+                           (let [[proto user password host port instance] (string/split connection-url #"://|:|/|@")]
+                             (str "jdbc:" proto "://" host ":" port "/" instance "?user=" user "&password=" password))
+                           nil))
 
 (defn start-crux-node ^crux.api.ICruxAPI [env]
   (let [{database-url    :jdbc-database-url
          database-config :database} env]
-    (update database-config :crux.jdbc/jdbcUrl #(or % database-url))
+    (update database-config :crux.jdbc/jdbcUrl #(or (make-jdbc-url %) database-url))
     (crux/start-node database-config)))
 
 (defstate ^:dynamic *crux-conn*
