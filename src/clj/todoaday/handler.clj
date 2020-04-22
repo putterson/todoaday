@@ -10,8 +10,7 @@
     [ring.middleware.webjars :refer [wrap-webjars]]
     [todoaday.env :refer [defaults]]
     [compojure.core :refer [defroutes routes wrap-routes GET]]
-    [mount.core :as mount]
-    [ring.middleware.reload :refer [wrap-reload]]))
+    [mount.core :as mount]))
 
 (mount/defstate init-app
   :start ((or (:init defaults) (fn [])))
@@ -45,7 +44,4 @@
 ;  auth-routes)
 (defn app []
   (middleware/wrap-base #'app-routes))
-
-(def reloadable-app
-  (wrap-reload #'app))
 
