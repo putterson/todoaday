@@ -1,6 +1,6 @@
 {:prod     true
  :database {
-            :crux.node/topology [crux.jdbc/topology]
+            :crux.node/topology [crux.standalone/topology]
             :crux.jdbc/dbname   "todoaday"
             :crux.jdbc/dbtype   "postgresql"
             }
