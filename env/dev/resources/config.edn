@@ -1,7 +1,12 @@
 {
- :database-type "h2"
- :database-dir  "./"
- :database-name "todoaday"
- :database-url  "jdbc:h2:./todoaday.db"
- :port          3000
+ :database {
+            :crux.node/topology [crux.jdbc/topology]
+            :crux.jdbc/dbname   "todoaday"
+            :crux.jdbc/dbtype   "h2"
+            :crux.jdbc/host     "localhost"
+            :crux.jdbc/user     "todoaday"
+            :crux.jdbc/password "todoaday"
+            :crux.kv/db-dir     "./db"
+            }
+ :port     3000
  }

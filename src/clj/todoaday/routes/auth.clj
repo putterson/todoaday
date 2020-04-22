@@ -1,7 +1,6 @@
 (ns todoaday.routes.auth
   (:require
     [todoaday.layout :as layout]
-    [todoaday.db.core :as db]
     [clojure.java.io :as io]
     [todoaday.middleware :as middleware]
     ;  [ring.util.http-response :as response]

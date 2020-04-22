@@ -6,7 +6,6 @@
     [expound.alpha :as expound]
     [mount.core :as mount]
     [todoaday.core :refer [start-app]]
-    [todoaday.db.core]
     [conman.core :as conman]
     [luminus-migrations.core :as migrations]
     [clojure.tools.namespace.repl :as repl]))
@@ -36,13 +35,13 @@
   []
   (repl/refresh))
 
-(defn restart-db 
-  "Restarts database."
-  []
-  (mount/stop #'todoaday.db.core/*db*)
-  (mount/start #'todoaday.db.core/*db*)
-  (binding [*ns* 'todoaday.db.core]
-    (conman/bind-connection todoaday.db.core/*db* "sql/queries.sql")))
+;(defn restart-db
+;  "Restarts database."
+;  []
+;  (mount/stop #'todoaday.db.core/*db*)
+;  (mount/start #'todoaday.db.core/*db*)
+;  (binding [*ns* 'todoaday.db.core]
+;    (conman/bind-connection todoaday.db.core/*db* "sql/queries.sql")))
 
 (defn reset-db 
   "Resets database."
