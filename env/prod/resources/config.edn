@@ -1,2 +1,7 @@
-{:prod true
- :port 3000}
+{:prod     true
+ :database {
+            :crux.node/topology [crux.jdbc/topology]
+            :crux.jdbc/dbname   "todoaday"
+            :crux.jdbc/dbtype   "postgresql"
+            }
+ :port     3000}
