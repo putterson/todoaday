@@ -17,7 +17,7 @@
 
 (defn home-routes []
   [""
-   {:middleware [middleware/wrap-csrf
+   {:middleware [
                  middleware/wrap-formats
                  middleware/wrap-restricted
                  ]}
