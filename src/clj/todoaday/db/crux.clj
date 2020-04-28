@@ -7,17 +7,21 @@
     [clojure.string :as string])
   (:import (java.util UUID)))
 
-(defn make-jdbc-url
+(defn extract-jdbc-parameters
   [maybe-connection-url] (if-some [connection-url maybe-connection-url]
                            (let [[proto user password host port instance] (string/split connection-url #"://|:|/|@")]
-                             (str "jdbc:" proto "://" host ":" port "/" instance "?user=" user "&password=" password))
+                             {:crux.jdbc/host     host
+                              :crux.jdbc/dbname   instance
+                              :crux.jdbc/user     user
+                              :crux.jdbc/password password})
                            nil))
 
 (defn start-crux-node ^crux.api.ICruxAPI [env]
-  (let [{database-url    :jdbc-database-url
-         database-config :database} env]
-    (update database-config :crux.jdbc/jdbcUrl #(or (make-jdbc-url %) database-url))
-    (crux/start-node database-config)))
+  (let [{database-url    :database-url
+         database-config :database} env
+        extracted-param-map (extract-jdbc-parameters database-url)
+        merged-database-config (into database-config extracted-param-map)]
+    (crux/start-node merged-database-config)))
 
 (defstate ^:dynamic *crux-conn*
           :start (start-crux-node env)
