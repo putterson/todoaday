@@ -35,6 +35,13 @@
                  [ring/ring-defaults "0.3.2"]
                  [ring-cors "0.1.13"]
                  [buddy/buddy-auth "2.2.0"]
+
+                 [com.fulcrologic/fulcro "3.0.9"]
+                 [com.fulcrologic/fulcro-garden-css "3.0.7"]
+                 [com.fulcrologic/semantic-ui-wrapper "1.0.0"]
+                 [com.fulcrologic/guardrails "0.0.9"]
+                 [bk/ring-gzip "0.3.0"]
+                 [com.wsscode/pathom "2.2.26"]
                  ;[com.auth0/mvc-auth-commons  "1.2.0"]
                  ;[auth0-ring "0.4.4"]
                  [clj-http "3.3.0"]

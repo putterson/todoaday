@@ -2,6 +2,7 @@
   (:require
     [todoaday.middleware :as middleware]
     [todoaday.layout :refer [error-page]]
+    [todoaday.routes.main :refer [main-handler]]
     [todoaday.routes.home :refer [home-routes]]
     [todoaday.routes.auth :refer [auth-routes]]
     [todoaday.routes.todo :refer [todo-routes]]
@@ -19,6 +20,7 @@
 (mount/defstate app-routes
   :start
   (routes
+    main-handler
     auth-routes
     todo-routes
     (ring/ring-handler
