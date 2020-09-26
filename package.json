@@ -1,0 +1,27 @@
+{
+  "name": "todoaday",
+  "version": "1.0.0",
+  "description": "generated using Luminus version \"3.48\"",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/putterson/todoaday.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/putterson/todoaday/issues"
+  },
+  "homepage": "https://github.com/putterson/todoaday#readme",
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "shadow-cljs": "^2.11.4"
+  }
+}

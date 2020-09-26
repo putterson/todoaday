@@ -1,21 +1,10 @@
 # todoaday
-
-generated using Luminus version "3.48"
-
-FIXME
-
 ## Prerequisites
-
-You will need [Leiningen][1] 2.0 or above installed.
-
-[1]: https://github.com/technomancy/leiningen
-
+You will need npm and clojure installed
 ## Running
 
-To start a web server for the application, run:
+To start the frontend
 
-    lein run 
+    npx shadow-cljs server
 
-## License
-
-Copyright © 2019 FIXME
+To start the backend
